@@ -152,7 +152,7 @@ VOID Print_Import_Directory(char* fileBuffer) {
 	IMAGE_IMPORT_DESCRIPTOR NullImportDirectory = { 0 };
 
 	while (1) {
-		size_t isEnd = memcmp(pImageImportDirectory, &NullImportDirectory, sizeof(IMAGE_IMPORT_DESCRIPTOR));
+		BOOL isEnd = pImageImportDirectory->OriginalFirstThunk != 0 && pImageImportDirectory->FirstThunk != 0;
 		if (!isEnd) {
 			break;
 		}
@@ -184,15 +184,15 @@ VOID Print_Import_Directory(char* fileBuffer) {
 		DWORD FOA_Of_ImportNameTable = RVA_To_FOA(fileBuffer, pImageImportDirectory->OriginalFirstThunk);
 		PIMAGE_THUNK_DATA32 pImageThunkData32Arr = (PIMAGE_THUNK_DATA32)((PBYTE)fileBuffer + FOA_Of_ImportNameTable);
 		while (pImageThunkData32Arr->u1.ForwarderString != 0x0000) {
-			// 最高位为1： 导出函数的序号
+			// 最高位为1： 导入函数的序号
 			if (pImageThunkData32Arr->u1.Ordinal & 0x8000 == 1) {
-				printf("函数按序号导出， 序号： %d\n", pImageThunkData32Arr->u1.Ordinal);
+				printf("函数按序号导入， 序号： %d\n", pImageThunkData32Arr->u1.Ordinal & 0x0FFF);
 			}
 			// 最高位不为1： PIMAGE_IMPORT_BY_NAME的RVA, PIMAGE_IMPORT_BY_NAME中包含函数名
 			else { 
 				DWORD FOA_Of_ImageImportByName = RVA_To_FOA(fileBuffer, pImageThunkData32Arr->u1.AddressOfData);
 				PIMAGE_IMPORT_BY_NAME pImageImportByName = (PIMAGE_IMPORT_BY_NAME)((PBYTE)fileBuffer + FOA_Of_ImageImportByName);
-				printf("函数按名称导出， 函数名： %s\n", pImageImportByName->Name);
+				printf("函数按名称导入， 函数名： %s\n", pImageImportByName->Name);
 			}
 			pImageThunkData32Arr += 1;
 		}
@@ -202,15 +202,15 @@ VOID Print_Import_Directory(char* fileBuffer) {
 		DWORD FOA_Of_ImportAddressTable = RVA_To_FOA(fileBuffer, pImageImportDirectory->FirstThunk);
 		PIMAGE_THUNK_DATA32 pImageThunkData32Arr_IAT = (PIMAGE_THUNK_DATA32)((PBYTE)fileBuffer + FOA_Of_ImportAddressTable);
 		while (pImageThunkData32Arr_IAT->u1.ForwarderString != 0x0000) {
-			// 最高位为1： 导出函数的序号
+			// 最高位为1： 导入函数的序号
 			if (pImageThunkData32Arr_IAT->u1.Ordinal & 0x8000 == 1) {
-				printf("函数按序号导出， 序号： %d\n", pImageThunkData32Arr_IAT->u1.Ordinal);
+				printf("函数按序号导入， 序号： %d\n", pImageThunkData32Arr_IAT->u1.Ordinal & 0x0FFF);
 			}
 			// 最高位不为1： PIMAGE_IMPORT_BY_NAME的RVA, PIMAGE_IMPORT_BY_NAME中包含函数名
 			else {
 				DWORD FOA_Of_ImageImportByName = RVA_To_FOA(fileBuffer, pImageThunkData32Arr_IAT->u1.AddressOfData);
 				PIMAGE_IMPORT_BY_NAME pImageImportByName = (PIMAGE_IMPORT_BY_NAME)((PBYTE)fileBuffer + FOA_Of_ImageImportByName);
-				printf("函数按名称导出， 函数名： %s\n", pImageImportByName->Name);
+				printf("函数按名称导入， 函数名： %s\n", pImageImportByName->Name);
 			}
 			pImageThunkData32Arr_IAT += 1;
 		}
