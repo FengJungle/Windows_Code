@@ -75,68 +75,6 @@ VOID Read_PE_File_To_FileBuffer(void** fileBuffer, int* pFileLength) {
 	fclose(fp);
 }
 
-DWORD RVA_To_FOA(char* fileBuffer, DWORD RvaAddress)
-{
-	PIMAGE_DOS_HEADER             pDosHeader = (PIMAGE_DOS_HEADER)fileBuffer;
-	PIMAGE_NT_HEADERS32            pNtHeader = (PIMAGE_NT_HEADERS32)(fileBuffer + pDosHeader->e_lfanew);
-	PIMAGE_FILE_HEADER      pImageFileHeader = (PIMAGE_FILE_HEADER)((char*)pNtHeader + 4);
-	PIMAGE_OPTIONAL_HEADER32 pOptionalHeader = (PIMAGE_OPTIONAL_HEADER32)((char*)pImageFileHeader + 0x14);
-	PIMAGE_SECTION_HEADER     pSectionHeader = (PIMAGE_SECTION_HEADER)((char*)pOptionalHeader + pImageFileHeader->SizeOfOptionalHeader);
-
-	if (RvaAddress < pOptionalHeader->SizeOfHeaders) {
-		return RvaAddress;
-	}
-
-	DWORD FoaAddress = 0x00;
-	int numOfSections = pImageFileHeader->NumberOfSections;
-	int sectionIndex = -1;
-	for (int i = 0; i < numOfSections; i++) {
-		if (RvaAddress >= pSectionHeader[i].VirtualAddress
-			&& RvaAddress < pSectionHeader[i].VirtualAddress + pSectionHeader[i].Misc.VirtualSize) {
-			sectionIndex = i;
-			break;
-		}
-	}
-	if (sectionIndex == -1) {
-		printf("[ERROR] %d: Wrong RVA!\n", __LINE__);
-		return -1;
-	}
-	int offset = RvaAddress - pSectionHeader[sectionIndex].VirtualAddress;
-	FoaAddress = pSectionHeader[sectionIndex].PointerToRawData + offset;
-	return FoaAddress;
-}
-
-DWORD FOA_To_RVA(char* fileBuffer, DWORD FoaAddress)
-{
-	PIMAGE_DOS_HEADER             pDosHeader = (PIMAGE_DOS_HEADER)fileBuffer;
-	PIMAGE_NT_HEADERS32            pNtHeader = (PIMAGE_NT_HEADERS32)(fileBuffer + pDosHeader->e_lfanew);
-	PIMAGE_FILE_HEADER      pImageFileHeader = (PIMAGE_FILE_HEADER)((char*)pNtHeader + 4);
-	PIMAGE_OPTIONAL_HEADER32 pOptionalHeader = (PIMAGE_OPTIONAL_HEADER32)((char*)pImageFileHeader + 0x14);
-	PIMAGE_SECTION_HEADER     pSectionHeader = (PIMAGE_SECTION_HEADER)((char*)pOptionalHeader + pImageFileHeader->SizeOfOptionalHeader);
-
-	if (FoaAddress < pOptionalHeader->SizeOfHeaders) {
-		return FoaAddress;
-	}
-
-	DWORD RvaAddress = 0x00;
-	int numOfSections = pImageFileHeader->NumberOfSections;
-	int sectionIndex = -1;
-	for (int i = 0; i < numOfSections; i++) {
-		if (FoaAddress >= pSectionHeader[i].PointerToRawData
-			&& FoaAddress < pSectionHeader[i].PointerToRawData + pSectionHeader[i].SizeOfRawData) {
-			sectionIndex = i;
-			break;
-		}
-	}
-	if (sectionIndex == -1) {
-		printf("[ERROR] %d: Wrong RVA!\n", __LINE__);
-		return -1;
-	}
-	int offset = FoaAddress - pSectionHeader[sectionIndex].PointerToRawData;
-	RvaAddress = pSectionHeader[sectionIndex].VirtualAddress + offset;
-	return RvaAddress;
-}
-
 DWORD FileDataSize_To_ImageDataSize(char* fileBuffer, DWORD fileDataSize) {
 
 	PIMAGE_DOS_HEADER             pDosHeader = (PIMAGE_DOS_HEADER)fileBuffer;
