@@ -29,3 +29,9 @@ Description: Print the Export Directory.
 Project Name: PETool_ImportDirectory
 
 Description: Parse and print the Import Directory of self-defined PE file.
+
+*=========================== 5  ===========================  
+
+Project Name: PETool_AddSection
+
+Description: Add a new section to the fileBuffer and save as a new file.
