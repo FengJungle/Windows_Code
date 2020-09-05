@@ -1,5 +1,0 @@
-﻿  main.c
-f:\jungle\1.program\3.windows\petool_relocation\petool_relocation\main.c(117): warning C4477: “printf”: 格式字符串“%p”需要类型“void *”的参数，但可变参数 1 拥有了类型“DWORD”
-f:\jungle\1.program\3.windows\petool_relocation\petool_relocation\main.c(135): warning C4018: “<”: 有符号/无符号不匹配
-f:\jungle\1.program\3.windows\petool_relocation\petool_relocation\main.c(140): warning C4244: “=”: 从“unsigned long”转换到“WORD”，可能丢失数据
-  PETool_Relocation.vcxproj -> F:\Jungle\1.Program\3.Windows\PETool_Relocation\Debug\PETool_Relocation.exe

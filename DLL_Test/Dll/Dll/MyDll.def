@@ -1,6 +1,0 @@
-LIBRARY 
-EXPORTS
-
-sum @2
-sub @3
-mul @9
