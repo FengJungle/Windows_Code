@@ -46,6 +46,34 @@ Project Name: PETool_Relocation
 Description: Print the Relocaton Directory.
 
 
+*=========================== 07  =========================== 
+
+Date: 2020-09-05
+
+Project Name: PETool_ExpandLastSection
+
+Description: Read original file and expand the last section, add 0x1000 in size, then save as a new file.
+
+
+*=========================== 08  =========================== 
+
+Date: 2020-09-05
+
+Project Name: PETool_MergeAllSections
+
+Description: Merge all sections to only one section.
+
+
+*=========================== 09  =========================== 
+
+Date: 2020-09-05
+
+Project Name: PETool_MoveExportTableToNewSection
+
+Description: Move exportDirectory to a new section.
+
+
+
 
 
 
