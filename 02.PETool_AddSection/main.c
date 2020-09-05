@@ -85,7 +85,26 @@ DWORD FileDataSize_To_ImageDataSize(char* fileBuffer, DWORD fileDataSize) {
 	if (pOptionalHeader->FileAlignment == pOptionalHeader->SectionAlignment) {
 		return fileDataSize;
 	}
+	if (fileDataSize % pOptionalHeader->SectionAlignment == 0) {
+		return (fileDataSize / pOptionalHeader->SectionAlignment)*pOptionalHeader->SectionAlignment;
+	}
 	return (1 + fileDataSize / pOptionalHeader->SectionAlignment)*pOptionalHeader->SectionAlignment;
+}
+
+DWORD ImageDataSize_To_FileDataSize(char* fileBuffer, DWORD imageDataSize) {
+
+	PIMAGE_DOS_HEADER             pDosHeader = (PIMAGE_DOS_HEADER)fileBuffer;
+	PIMAGE_NT_HEADERS32            pNtHeader = (PIMAGE_NT_HEADERS32)(fileBuffer + pDosHeader->e_lfanew);
+	PIMAGE_FILE_HEADER      pImageFileHeader = (PIMAGE_FILE_HEADER)((char*)pNtHeader + 4);
+	PIMAGE_OPTIONAL_HEADER32 pOptionalHeader = (PIMAGE_OPTIONAL_HEADER32)((char*)pImageFileHeader + 0x14);
+
+	if (pOptionalHeader->FileAlignment == pOptionalHeader->SectionAlignment) {
+		return imageDataSize;
+	}
+	if (imageDataSize % pOptionalHeader->FileAlignment == 0) {
+		return (imageDataSize / pOptionalHeader->FileAlignment)*pOptionalHeader->FileAlignment;
+	}
+	return (1 + imageDataSize / pOptionalHeader->FileAlignment)*pOptionalHeader->FileAlignment;
 }
 
 /*
@@ -114,7 +133,13 @@ VOID Move_NtHeader(char* fileBuffer, DWORD fileBufferLength) {
 	//Save_Buffer_To_File(fileBuffer, fileBufferLength);
 }
 
-VOID Add_Section(char* fileBuffer, DWORD fileBufferLength) {
+VOID Add_Section(
+	char* fileBuffer, 
+	DWORD fileBufferLength,
+	char** newFileBuffer,
+	DWORD* newFileBufferLength,
+	DWORD  addSectionLength)
+{
 
 	PIMAGE_DOS_HEADER             pDosHeader = (PIMAGE_DOS_HEADER)fileBuffer;
 	PIMAGE_NT_HEADERS32            pNtHeader = (PIMAGE_NT_HEADERS32)(fileBuffer + pDosHeader->e_lfanew);
@@ -148,8 +173,8 @@ VOID Add_Section(char* fileBuffer, DWORD fileBufferLength) {
 	// 3.2 设置新增节的属性
 	CHAR SectionName[8] = ".NewSec";
 	memcpy(NewSectionHeader.Name, SectionName, sizeof(SectionName));
-	NewSectionHeader.Misc.VirtualSize = 0x1000;
-	NewSectionHeader.SizeOfRawData = 0x1000;
+	NewSectionHeader.Misc.VirtualSize = addSectionLength;
+	NewSectionHeader.SizeOfRawData = addSectionLength;
 	NewSectionHeader.PointerToRawData = (DWORD)(pLastSection->PointerToRawData + (DWORD)pLastSection->SizeOfRawData);
 	NewSectionHeader.VirtualAddress = (DWORD)(pLastSection->VirtualAddress + FileDataSize_To_ImageDataSize(fileBuffer, (DWORD)pLastSection->SizeOfRawData));
 	NewSectionHeader.Characteristics = 0x6000020;
@@ -159,53 +184,58 @@ VOID Add_Section(char* fileBuffer, DWORD fileBufferLength) {
 	NewSectionHeader.NumberOfLinenumbers = 0;
 
 	// 4. 分配新buffer
-	char* newFileBuffer = (char*)malloc(fileBufferLength + NewSectionHeader.SizeOfRawData);
-	if (NULL == newFileBuffer) {
+	*newFileBuffer = (char*)malloc(fileBufferLength + NewSectionHeader.SizeOfRawData);
+	if (NULL == *newFileBuffer) {
 		printf("[ERROR] %d: malloc failed!\n", __LINE__);
 		return;
 	}
 
 	// 4.1 复制fileBuffer到newFileBuffer
-	memcpy(newFileBuffer, fileBuffer, fileBufferLength);
+	memcpy(*newFileBuffer, fileBuffer, fileBufferLength);
 
 	// 4.2 设置新增节的内容为0
-	memset(newFileBuffer + fileBufferLength, 0, NewSectionHeader.SizeOfRawData);
+	memset(*newFileBuffer + fileBufferLength, 0, NewSectionHeader.SizeOfRawData);
 
 	// 5. 获取newFileBuffer属性
-	pDosHeader = (PIMAGE_DOS_HEADER)newFileBuffer;
-	pNtHeader = (PIMAGE_NT_HEADERS32)(newFileBuffer + pDosHeader->e_lfanew);
+	pDosHeader = (PIMAGE_DOS_HEADER)*newFileBuffer;
+	pNtHeader = (PIMAGE_NT_HEADERS32)(*newFileBuffer + pDosHeader->e_lfanew);
 	pImageFileHeader = (PIMAGE_FILE_HEADER)((char*)pNtHeader + 4);
 	pOptionalHeader = (PIMAGE_OPTIONAL_HEADER32)((char*)pImageFileHeader + 0x14);
 
 	// 6. 修改newFileBuffer属性
 	pImageFileHeader->NumberOfSections += 1;
-	pOptionalHeader->SizeOfImage += (newFileBuffer, 0x1000);
+	pOptionalHeader->SizeOfImage += FileDataSize_To_ImageDataSize(*newFileBuffer, 0x1000);
 	pSectionHeader = (PIMAGE_SECTION_HEADER)((char*)pOptionalHeader + pImageFileHeader->SizeOfOptionalHeader);
 
 	// 7. 复制新增节到节表中
 	memcpy((char*)(pSectionHeader + pImageFileHeader->NumberOfSections - 1), &NewSectionHeader, sizeof(IMAGE_SECTION_HEADER));
 
 	// 8. 保存
-	Save_Buffer_To_File(newFileBuffer, fileBufferLength + NewSectionHeader.SizeOfRawData);
+	Save_Buffer_To_File(*newFileBuffer, fileBufferLength + NewSectionHeader.SizeOfRawData);
 
-	// 9. 释放资源
-	free(newFileBuffer);
-	newFileBuffer = NULL;
+	*newFileBufferLength = fileBufferLength + NewSectionHeader.SizeOfRawData;
 }
 
 int main()
 {
 	char* fileBuffer = NULL;
 	int fileBufferLength = 0;
+	char* newFileBuffer = NULL;
+	int newFileBufferLength = 0;
+	int addSectionLength = 0x1000;
 
 	Read_PE_File_To_FileBuffer(&fileBuffer, &fileBufferLength);
 	
-	Add_Section(fileBuffer, fileBufferLength);
+	Add_Section(fileBuffer, fileBufferLength, &newFileBuffer, &newFileBufferLength, addSectionLength);
 
 	if (fileBuffer) {
 		memset(fileBuffer, 0, fileBufferLength);
 		free(fileBuffer);
 		fileBuffer = NULL;
+	}
+	if (newFileBuffer) {
+		free(newFileBuffer);
+		newFileBuffer = NULL;
 	}
 
 	return 0;
