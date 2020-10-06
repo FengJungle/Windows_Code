@@ -73,6 +73,17 @@ Project Name: PETool_MoveExportTableToNewSection
 Description: Move exportDirectory to a new section.
 
 
+*=========================== 11  =========================== 
+
+Date: 2020-10-06
+
+Project Name: TcpSocket_File
+
+Description: WinSock network. Use TCP/IP to implement a Server/Client, client can receive any file from server.
+
+Blog: https://blog.csdn.net/sinat_21107433/article/details/80869887
+
+
 
 
 
