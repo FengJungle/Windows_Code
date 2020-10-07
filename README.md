@@ -84,6 +84,15 @@ Description: WinSock network. Use TCP/IP to implement a Server/Client, client ca
 Blog: https://blog.csdn.net/sinat_21107433/article/details/80869887
 
 
+*=========================== 12  =========================== 
+
+Date: 2020-10-07
+
+Project Name: TcpSocket_Message
+
+Description: WinSock network. Use TCP/IP to implement a Server/Client, client can send any message to server.
+
+
 
 
 
