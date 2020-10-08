@@ -104,6 +104,46 @@ Description: WinSock network. Use UDP/IP to implement a Server/Client, client ca
 Blog: https://blog.csdn.net/sinat_21107433/article/details/103537437
 
 
+*=========================== 15  =========================== 
+
+Date: 2020-10-08
+
+Project Name: TcpSocket_BlockMode
+
+Description: 基于WinSock的TCP通信模型，阻塞式模型，即每次只服务一个连接，只有在服务完当前客户连接之后，才会继续服务下一个客户端连接。
+
+服务端流程：
+
+/*
+* 1. 先处理连接，绑定本地地址和监听
+*    SOCKET Bind_Listen(int nBackLog)
+* 2. 接收一个客户端连接并返回对应的连接的套接字
+*    SOCKET AcceptConnection(SOCKET hSocket)
+* 3. 处理一个客户端的连接，实现接收和发送数据
+*    BOOL ClientConFun(SOCKET sd)
+* 4. 关闭一个连接
+*    BOOL CloseConnect(SOCEKT sd)
+* 5. 服务器主体
+*    VOID TcpServerFunc()
+*/
+
+客户端流程：
+
+/*
+* 1. 先与服务端建立连接，返回对应的连接的套接字
+*    SOCKET ConnectToServer()
+* 2. 客户端发送数据到服务端
+*    BOOL ClientSendFunc(SOCKET hSocket)
+* 3. 关闭一个连接
+*    BOOL CloseConnect(SOCEKT sd)
+* 4. 客户端主体
+*    VOID TcpClientFun()
+*/
+
+
+
+
+
 
 
 
