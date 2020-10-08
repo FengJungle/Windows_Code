@@ -178,6 +178,15 @@ Description: 基于WinSock的TCP通信模型，阻塞式模型迭代模式，即
 */
 
 
+*=========================== 16  =========================== 
+
+Date: 2020-10-08
+
+Project Name: TcpSocket_NonBlockMode
+
+Description: 基于WinSock的TCP通信模型，非阻塞式模型。
+
+
 
 
 
