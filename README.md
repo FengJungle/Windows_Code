@@ -110,7 +110,7 @@ Date: 2020-10-08
 
 Project Name: TcpSocket_BlockMode
 
-Description: 基于WinSock的TCP通信模型，阻塞式模型，即每次只服务一个连接，只有在服务完当前客户连接之后，才会继续服务下一个客户端连接。
+Description: 基于WinSock的TCP通信模型，阻塞式模型迭代模式，即每次只服务一个连接，只有在服务完当前客户连接之后，才会继续服务下一个客户端连接。
 
 服务端流程：
 
