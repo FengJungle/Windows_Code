@@ -71,6 +71,8 @@ int main()
 	int client_addr_len = sizeof(client_addr);
 	SOCKET client_Socket;
 
+_start:
+
 	while (true) {
 		// 非阻塞式，所以会直接返回
 		client_Socket = accept(server_Socket, (sockaddr *)&client_addr, &client_addr_len);
@@ -137,9 +139,10 @@ int main()
 				else {
 					printf("[ERROR] Server Receive Data Failed with Error Code:0x%x\n", errCode);
 					closesocket(client_Socket);
-					closesocket(server_Socket);
-					WSACleanup();
-					return -1;
+					//closesocket(server_Socket);
+					//WSACleanup();
+					//return -1;
+					goto _start;
 				}
 			}
 		}
