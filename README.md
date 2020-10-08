@@ -93,6 +93,43 @@ Project Name: TcpSocket_Message
 Description: WinSock network. Use TCP/IP to implement a Server/Client, client can send any message to server.
 
 
+*=========================== 13  =========================== 
+
+Date: 2020-10-08
+
+Project Name: TcpSocket_MultiThread
+
+Description: 基于WinSock的TCP通信模型，阻塞式模型并发模式，即每次客户端请求连接时，服务端开启一个线程处理。
+
+服务端流程：
+
+/*
+* 1. 先处理连接，绑定本地地址和监听
+*    SOCKET Bind_Listen(int nBackLog)
+* 2. 接收一个客户端连接并返回对应的连接的套接字
+*    SOCKET AcceptConnection(SOCKET hSocket)
+* 3. 处理一个客户端的连接，实现接收和发送数据
+*    BOOL ClientConFun(SOCKET sd)
+* 4. 关闭一个连接
+*    BOOL CloseConnect(SOCEKT sd)
+* 5. 服务器主体
+*    VOID TcpServerFunc()
+*/
+
+客户端流程：
+
+/*
+* 1. 先与服务端建立连接，返回对应的连接的套接字
+*    SOCKET ConnectToServer()
+* 2. 客户端发送数据到服务端
+*    BOOL ClientSendFunc(SOCKET hSocket)
+* 3. 关闭一个连接
+*    BOOL CloseConnect(SOCEKT sd)
+* 4. 客户端主体
+*    VOID TcpClientFun()
+*/
+
+
 *=========================== 14  =========================== 
 
 Date: 2020-10-08
