@@ -200,6 +200,29 @@ select模型是一种比较常用的IO模型。利用该模型可以使Windows s
 Select模型的核心是select函数。调用select函数检查当前各个套接字的状态。根据函数的返回值判断套接字的可读可写性。然后调用相应的Windows Sockets API完成数据的发送、接收等。Select模型是Windows sockets中最常见的IO模型。它利用select函数实现IO 管理。通过对select函数的调用，应用程序可以判断套接字是否存在数据、能否向该套接字写入数据。   如：在调用recv函数之前，先调用select函数，如果系统没有可读数据那么select函数就会阻塞在这里。当系统存在可读或可写数据时，select函数返回，就可以调用recv函数接收数据了。
 
 
+*=========================== 18 =========================== 
+
+Date: 2020-10-11
+
+Project Name: WinSock_WSAEventSelect
+
+Description: 基于WinSock的事件选择通信模型，非阻塞式模型, 采用WSAEventSelect实现单线程下的并发模式。
+
+int WSAEventSelect(
+
+  _In_  SOCKET s,               // 绑定到事件对象上的套接字
+  
+  _In_  WSAEVENT hEventObject,  // 网络事件对象
+  
+  _In_  long lNetworkEvents     // 绑定网络事件监听的消息类型FD_XXX 
+  
+);
+
+功能：  将指定的网络套接字和需要检测的信号绑定到网络事件上，交由操作系统帮我们监测套接字信号的到来。
+
+返回值：成功返回0，否则返回SOCKET_ERROR
+
+
 
 
 
