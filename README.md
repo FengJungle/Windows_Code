@@ -193,18 +193,11 @@ Date: 2020-10-11
 
 Project Name: TcpSocket_Select
 
-Description: 基于WinSock的TCP通信模型，非阻塞式模型,  采用select模型实现单线程下的并发模式。
+Description: 基于WinSock的TCP通信模型，非阻塞式模型, 采用select模型实现单线程下的并发模式。
 
-WINSOCK_API_LINKAGE
-int
-WSAAPI
-select(
-    _In_ int nfds,
-    _Inout_opt_ fd_set FAR * readfds,
-    _Inout_opt_ fd_set FAR * writefds,
-    _Inout_opt_ fd_set FAR * exceptfds,
-    _In_opt_ const struct timeval FAR * timeout
-    );
+select模型是一种比较常用的IO模型。利用该模型可以使Windows socket应用程序可以同时管理多个套接字。使用select模型，可以使当执行操作的套接字满足可读可写条件时，给应用程序发送通知。收到这个通知后，应用程序再去调用相应的Windows socket API去执行函数调用。     
+
+Select模型的核心是select函数。调用select函数检查当前各个套接字的状态。根据函数的返回值判断套接字的可读可写性。然后调用相应的Windows Sockets API完成数据的发送、接收等。Select模型是Windows sockets中最常见的IO模型。它利用select函数实现IO 管理。通过对select函数的调用，应用程序可以判断套接字是否存在数据、能否向该套接字写入数据。   如：在调用recv函数之前，先调用select函数，如果系统没有可读数据那么select函数就会阻塞在这里。当系统存在可读或可写数据时，select函数返回，就可以调用recv函数接收数据了。
 
 
 
