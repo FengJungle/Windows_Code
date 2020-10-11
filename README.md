@@ -187,6 +187,27 @@ Project Name: TcpSocket_NonBlockMode
 Description: 基于WinSock的TCP通信模型，非阻塞式模型。
 
 
+*=========================== 17 =========================== 
+
+Date: 2020-10-11
+
+Project Name: TcpSocket_Select
+
+Description: 基于WinSock的TCP通信模型，非阻塞式模型,  采用select模型实现单线程下的并发模式。
+
+WINSOCK_API_LINKAGE
+int
+WSAAPI
+select(
+    _In_ int nfds,
+    _Inout_opt_ fd_set FAR * readfds,
+    _Inout_opt_ fd_set FAR * writefds,
+    _Inout_opt_ fd_set FAR * exceptfds,
+    _In_opt_ const struct timeval FAR * timeout
+    );
+
+
+
 
 
 
